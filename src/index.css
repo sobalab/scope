@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+
+/*
+  Vitals design tokens.
+  One place to change palette and type. Everything downstream reads these.
+  Palette is a light clinical "chart paper" theme, not dark mode.
+  Acuity colors are muted and read as gravity, not traffic lights.
+*/
+@theme {
+  /* surfaces */
+  --color-paper: #eae7de; /* cool greige page */
+  --color-surface: #f5f3ec; /* raised: featured card, drawer, row hover */
+  --color-sunk: #e1ddd1; /* recessed: band tracks, ledger grouping */
+  --color-hair: #d6d1c3; /* faint edge, used sparingly, never as a divider */
+
+  /* ink (navy charcoal, never neutral grey) */
+  --color-ink: #1f2933; /* primary text and interactive */
+  --color-ink-soft: #4c5761; /* secondary text and labels, AA on paper */
+  --color-ink-mute: #6b7580; /* decorative only, not text */
+
+  /* acuity, muted and clinical */
+  --color-moss: #4f6043; /* stable */
+  --color-ochre: #7c531c; /* watch */
+  --color-rust: #9b3b25; /* acute */
+  --color-oxblood: #5e2419; /* critical, a deeper rust, not a brighter red */
+
+  /* type: three families, three jobs */
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+
+  --radius-card: 10px;
+  --radius-chip: 6px;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Fraunces reads best with a high optical size for display use, held back on weight. */
+  .font-display {
+    font-variation-settings: 'opsz' 120, 'SOFT' 0, 'WONK' 0;
+    letter-spacing: -0.012em;
+  }
+
+  /* Tabular, aligned figures everywhere numbers stack in the ledger. */
+  .font-mono {
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-ochre) 24%, var(--color-paper));
+  }
+
+  /* Visible keyboard focus is part of the quality floor. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
