@@ -1,5 +1,5 @@
-import { ReviewScreen } from './review/ReviewScreen.tsx'
+import { StudioDashboard } from './dashboard/StudioDashboard.tsx'
 
 export default function App() {
-  return <ReviewScreen />
+  return <StudioDashboard />
 }

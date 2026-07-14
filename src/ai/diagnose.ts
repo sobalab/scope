@@ -12,23 +12,10 @@
 
 import type { Project, VitalKind, VitalSeries } from '../domain/types.ts'
 import type { Assessment } from './../domain/acuity.ts'
-import { VITAL_META } from '../components/vitals/vitalMeta.ts'
+import { vitalLoad } from '../domain/acuity.ts'
 
 const factValue = (v: VitalSeries, key: string): string =>
   v.facts.find((f) => f.label.includes(key))?.value ?? ''
-
-/** Which single reading best explains the current state, plus its supporting facts. */
-export interface Trace {
-  kind: VitalKind
-  label: string
-  facts: { label: string; value: string }[]
-}
-
-export const complaintTrace = (project: Project, assessment: Assessment): Trace => {
-  const kind = assessment.drivers[0]
-  const v = project.vitals[kind]
-  return { kind, label: VITAL_META[kind].label, facts: v.facts }
-}
 
 const driverSentence = (project: Project, assessment: Assessment): string => {
   const kind = assessment.drivers[0]
@@ -141,4 +128,56 @@ export const roundsBriefing = (entries: PortfolioEntry[]): string => {
   }
 
   return sentences.join(' ')
+}
+
+/*
+  What should happen next. Concrete, owner-facing actions derived from the vitals that
+  are actually out of range, plus the soonest gate. Advisory, never automatic: the team
+  decides and acts. On-track projects return nothing, which is itself the answer.
+*/
+const actionForVital = (project: Project, kind: VitalKind): string | null => {
+  const v = project.vitals[kind]
+  switch (kind) {
+    case 'pulse':
+      return `Reply to the client and get the team shipping again, quiet ${
+        factValue(v, 'quiet') || factValue(v, 'replied')
+      }.`
+    case 'pressure':
+      return `Reset budget and scope with the client, ${factValue(v, 'hours')} of hours used against ${factValue(
+        v,
+        'scope',
+      )} delivered.`
+    case 'respiration': {
+      const b = project.blockers.find((x) => x.state === 'open')
+      return b
+        ? `Unblock ${b.title.toLowerCase()}, open ${b.ageDays} days and owned by ${b.owner.toLowerCase()}.`
+        : `Clear the oldest open blocker, ${factValue(v, 'oldest')}.`
+    }
+    case 'temperature':
+      return `Re-scope with the client, ${factValue(v, 'new requests')} new requests in two weeks.`
+  }
+}
+
+export const nextActions = (project: Project, assessment: Assessment): string[] => {
+  if (assessment.insufficient) {
+    return [`Check back once ${project.client} has two full weeks of history to read.`]
+  }
+  if (assessment.chronic) {
+    return [`Leave it. This is normal for ${project.client} and nothing changed this week.`]
+  }
+  if (assessment.acuity === 'stable') return []
+
+  const out: string[] = []
+  if (project.gate) {
+    out.push(
+      `Clear the ${project.gate.label.toLowerCase()} before it gates ${project.gate.blocks} in ${project.gate.daysAway} days.`,
+    )
+  }
+  for (const kind of assessment.drivers) {
+    if (out.length >= 3) break
+    if (vitalLoad(project.vitals[kind]) < 0.25) continue
+    const action = actionForVital(project, kind)
+    if (action && !out.includes(action)) out.push(action)
+  }
+  return out.slice(0, 3)
 }

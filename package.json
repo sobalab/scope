@@ -12,18 +12,13 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
-    "@fontsource-variable/fraunces": "^5.0.0",
-    "@fontsource-variable/hanken-grotesk": "^5.0.0",
-    "@fontsource/ibm-plex-mono": "^5.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "tailwindcss": "^4.1.0",
     "typescript": "^5.7.2",
     "vite": "^6.3.5"
   }
