@@ -1,114 +1,105 @@
-# Fieldwork
+# Ardent
 
-An internal dashboard for a small product studio to see, at a glance, which client
-projects are on track, which need a person today, and what to do next. It runs with no
-API key.
+A production board for an eight person event design firm running six client events at
+once. The producer opens it every morning with one question: which event do I chase
+today? It runs with no API key.
 
 ```
 pnpm install && pnpm dev
 ```
 
-## The health model
+## Why readiness against a fixed date beats a status board
 
-Every project carries four vitals, each with a reading, a normal band, a week over week
-delta, and a 14 day trend.
+The date does not move. The gala happens on its day whether the florist confirmed or not,
+so "how long have we been working" and "what percent complete are we" are the wrong
+questions. The right one is how ready the event is against how little time is left. An
+event 60% built with three weeks to go is calm; the same 60% with nine days to go is the
+fire. Every reading in Ardent is built on that ratio, and the board sorts by how soon the
+trouble bites, not by name or date.
 
-- **Pulse** is momentum. Days since either side moved. Silence is the earliest warning.
-- **Pressure** is budget against scope. Points of budget spent ahead of scope delivered.
-- **Temperature** is scope volatility. New requests added in two weeks.
-- **Respiration** is blocker flow. The age of the oldest open blocker.
+The hero chart, the horizon, draws this directly. Each event is an arc about one shared
+origin. Radius is time left, so the soonest event is the tight inner ring about to land.
+The arc runs kickoff to show day with a lit head at today, solid behind, dashed ahead.
+Readiness rides a second line inside the same arc, and when it falls behind the clock a
+wedge opens between the two lines. That wedge is the whole product in one mark: you can
+see the pop up is 12 days out and only 60% ready without reading a number. Exactly one
+event may glow, the most urgent, and only when it is at risk. Light is data here. When
+nothing glows, that calm is itself the answer.
 
-Acuity is one of `stable`, `watch`, `acute`, `critical`, sorted by time to harm rather
-than severity alone. It is never written into the data. It is computed in
-`src/domain/acuity.ts` from the vitals, so if you change a trend the acuity can change,
-which is the point. The scoring function is short and meant to be read.
+## Lock dates
 
-### Acute versus chronic
+The real deadlines are not the event, they are the locks before it: final headcount with
+the venue, the menu with the caterer, the floor plan before rentals ship, the permit
+window. Missing one does not move the date, it makes the event cost more or fall apart.
+The detail page is built around them: each lock shows what locks, when, who owns it, and
+what breaks if it is missed. Passed locks are solid, upcoming are dashed, and a missed
+lock is the loudest thing in the product. Show day sits at the end as a fixed point.
 
-This is the most important idea in the product. Every vital is judged against the
-project's own baseline, not a global one. A project can be objectively poor and still
-read `stable` because nothing changed. Cobalt Bank has slipped for two years, so it
-carries a `chronic` marker and stays quiet. Deterioration against a project's own normal
-is the signal. Absolute value is context. See `src/domain/baseline.ts`.
+Dashed versus solid is one grammar everywhere: a dashed vendor is unconfirmed, a solid
+vendor is contracted; a dashed lock is coming, a solid one is done; the dashed part of an
+arc is the work still ahead.
 
-## Attention trails, the overview chart
+## New versus normal
 
-The first thing on the page is `src/dashboard/AttentionTrails.tsx`. One row per project,
-14 days left to right, today pinned at the right edge. Each day a project got attention
-becomes a dot, and the dots ride a single filled ribbon toward today.
+Every producer knows their clients, and some clients always run late. Flagging Verdant
+every morning for being Verdant is how a board teaches you to ignore it. So each signal
+is judged against how that client normally runs, not a universal bar. The standing logic
+in `src/ardent/domain/standing.ts` is short and meant to be read: what moved away from
+the client's own baseline drives the standing, where it sits is capped context. The
+baseline is drawn as hatching behind every live reading, on the arcs and in the rail, so
+"behind but normal" and "just slipped" look different at a glance. Verdant sits behind
+and quiet with a plain marker saying so; Solaro jumped because it slipped this week.
 
-Every mark encodes a real value.
+## Written lines show their source
 
-- **x** is the day. **y** is the project row, sorted sickest first.
-- **Dot area** is the volume of attention that day, commits and messages and hours and
-  deliverables. A trace day is a small dot, not an absent one.
-- **Ribbon width** is momentum, a recency weighted average, so a lone spike reads thin
-  and a sustained run reads thick. **Ribbon opacity** brightens toward the head.
-- **The gap** is the silence. When a project goes quiet the ribbon ends at its last dot
-  and bare background runs to the today line. The gap's width is literally the number of
-  days since anyone touched the project. Keystone has been silent for 14 days, and its
-  empty row is the first thing you see.
-
-It is plain SVG so hover, focus, and keyboard work without reimplementing them, and it
-reads correctly as a still image in a screen recording. The colors are a cool slate ramp
-that deepens with severity, so the chart never becomes a rainbow and agrees with the rest
-of the product. On load the trails wipe in left to right and stop at each head, so the
-motion peters out on the gaps. It respects `prefers-reduced-motion`.
-
-## Navigation
-
-The overview is home. `/project/:id` is a full page with a real, shareable URL, not a
-modal, because it is a page you sit inside while working through blockers and milestones.
-A trail row, a ledger card, and a project tab are three doors to the same detail page.
-The overview's scroll position is preserved when you come back, so you never lose your
-place. The router is a small wrapper on the History API in `src/router.tsx`, no
-dependency.
-
-## AI
-
-Three placements, all grounded in the project's own numbers so a reply can be traced to a
-reading, and all working with no API key.
-
-- The **rounds briefing** at the top names the one project that needs a person today and
-  says what changed, in specific numbers.
-- The **chief complaint** on each project is one sentence naming why it is at its acuity,
-  with its supporting vitals shown underneath.
-- **Ask the chart** on the detail page answers scoped questions from the vitals. It says
-  when the data is thin rather than guessing.
-
-They are composed from the data in `src/ai/`, so they cannot drift from the vitals.
+The writing appears in three places: the morning read on the board, the what to watch
+line on each event, and ask about this event. All three are composed from the same
+signals the charts draw, so every sentence traces to a real number, and the numbers
+render as chips beside the text. It advises and never decides, it says when a read is
+soft ("Corvus is 180 days out with almost nothing logged yet"), it streams with skeletons
+shaped like the incoming text, and a failed response has a retry that keeps your place.
+With no key set it streams the composed text on a realistic delay, which is also why the
+claims can never drift from the data. Press ? for shortcuts, and ! to see the failure
+state on demand.
 
 ## States
 
-Reachable in the running app:
+All reachable in the running app: loading skeletons on both pages; the missed lock on
+Solaro; behind but normal on Verdant; too new to read on Corvus; landed and in teardown
+on Halcyon; the crew clash between Solaro and Lumen; set aside with one keystroke,
+undoable from the toast, with the return time stated; the failed written response with
+retry; and the quiet day, which appears once the hot events are handled and says what the
+nearest open lock is rather than showing a blank.
 
-- Chart: loading skeleton, insufficient data (Ovid, a short trail with a start marker),
-  fully silent (Keystone, an anchor and a label), and all healthy (the "on track" filter
-  shows a calm field of trails reaching the edge).
-- Detail: loading skeletons, wrapping up (Alder), snoozed (Keystone), and three distinct
-  empty states written as their own sentences: no blockers (Alder), no open questions
-  (Keystone), and no recent activity (Keystone).
+## Keyboard
 
-## Design
+J and K move between arcs, Enter opens, arrows walk a focused arc day by day, S sets
+aside, Esc closes, ? shows the sheet. The arcs are a roving tabindex group with visible
+focus, and under 900px they become stacked runway bars carrying the same reading.
 
-Frosted Glass, a cool near monochrome system with one slate accent. Health escalates by
-position and depth, never a traffic light. No monospace anywhere.
+## Left out on purpose
 
-## What is deliberately left out
+No sign in, billing, account settings, event creation, timesheets, or client facing
+views. The six events are authored data with enough history for the trends to be real;
+the shape they derive from (locks, vendors, replies, allocations) is what the firm's
+calendar, email, and booking tools would feed.
 
-Authentication, billing, account settings, project creation, time tracking, and any
-client facing view. The attention data is authored to tell a clear story rather than
-pulled from real tools. The shape it derives from, a per day volume and a note, is what a
-commit, chat, and time tracking feed would provide.
+## With more time
+
+Live data adapters behind the same signal interface, a week-over-week replay of the
+horizon so Monday's board can be compared with last Monday's, per-client baseline
+learning instead of authored normals, and crew rebalancing suggestions when two events
+collide on a weekend.
 
 ## Structure
 
 ```
-src/
-  domain/     health model: types, vitals, baseline, acuity, attention
-  data/       projects, history, attention (six client projects, authored trends)
-  ai/         diagnose (briefing, chief complaint, next actions), ask
-  ds/         Frosted Glass design system: tokens and primitives
-  dashboard/  Overview, AttentionTrails, VitalBar, and the detail page
-  router.tsx  History API router with scroll preservation
+src/ardent/
+  domain/    types, signals, standing (the logic that decides who needs chasing)
+  data/      six authored events
+  ai/        compose (the grounded writing), useStream (mock streaming)
+  board/     Board, Horizon (the arc chart and its runway reflow)
+  detail/    EventDetail, Rail (signals, budget, crew, ask, actions)
+  shared/    standing presentation, streamed text, toast
+  router.tsx History API router with scroll preservation
 ```

@@ -12,6 +12,9 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@fontsource-variable/doto": "^5.2.10",
+    "@fontsource-variable/manrope": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
