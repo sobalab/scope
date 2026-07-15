@@ -124,7 +124,8 @@ export function SpectrumScore({
                   }}
                 >
                   <span style={{ width: 7, height: 7, background: 'var(--accent)', borderRadius: 1.5 }} />
-                  {it.label} · {it.value.toFixed(1)}
+                  {it.label}
+                  <span style={{ marginLeft: 6, opacity: 0.6 }}>{it.value.toFixed(1)}</span>
                 </div>
               </div>
             )

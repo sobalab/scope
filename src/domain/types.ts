@@ -47,10 +47,17 @@ export interface Milestone {
   state: MilestoneState
   /** True when this milestone holds up downstream work. */
   gating?: boolean
+  /** For a slipped milestone, the dueInDays it was first promised. The slip is the information. */
+  slippedFrom?: number
+  /** How many times this milestone has slipped. */
+  slipCount?: number
 }
+
+export type BlockerKind = 'blocker' | 'risk' | 'question'
 
 export interface Blocker {
   id: string
+  kind: BlockerKind
   title: string
   ageDays: number
   owner: string // 'Client, design sign off'
@@ -65,6 +72,23 @@ export interface ActivityEvent {
   kind: ActivityKind
   who: string
   text: string
+}
+
+export interface Allocation {
+  name: string
+  role: string
+  /** Percent of this person's time on the project, 0 to 100. */
+  allocation: number
+}
+
+/**
+ * One day on the attention trail. volume 0 means nobody touched the project that day,
+ * which is what makes the gap. Higher volume means more attention: commits, messages,
+ * hours logged, deliverables shipped.
+ */
+export interface AttentionDay {
+  volume: number
+  note: string | null
 }
 
 export interface BudgetScope {
@@ -95,5 +119,7 @@ export interface Project {
   milestones: Milestone[]
   blockers: Blocker[]
   activity: ActivityEvent[]
+  /** Who is on this project and at what allocation. */
+  resourcing: Allocation[]
   gate?: Gate
 }

@@ -5,11 +5,15 @@
   the point.
 
     Hartwell   acute, featured. Pulse deteriorated hard this week.
-    Keystone   critical, seeded snoozed. Old blocker, slipped gate, over budget.
+    Keystone   critical, seeded snoozed, and fully silent on the trail. Abandoned.
     Ferrous    watch. Budget running ahead of scope with weeks of runway.
     Cobalt     stable with a chronic marker. Objectively poor, but flat for two years.
     Alder      stable, wrapping up. Every vital calm, most milestones delivered.
     Ovid       insufficient data. Twelve days old, no baseline yet.
+
+  The vitals, history, and facts below are unchanged from the verified model. The added
+  fields (blocker kind, resourcing, milestone slip history) feed the detail page and do
+  not touch acuity.
 */
 
 import type { Project } from '../domain/types.ts'
@@ -24,7 +28,7 @@ const hartwell: Project = {
   vitals: {
     pulse: vital('pulse', trend(1.5, 9, { texture: 0.4 }), [
       { label: 'client quiet', value: '9 days' },
-      { label: 'last shipped', value: '4 days ago' },
+      { label: 'last shipped', value: '5 days ago' },
     ]),
     pressure: vital('pressure', trend(6, 8), [
       { label: 'hours used', value: '76%' },
@@ -49,17 +53,31 @@ const hartwell: Project = {
   blockers: [
     {
       id: 'hb1',
+      kind: 'blocker',
       title: 'Design sign off from the brand team',
       ageDays: 6,
       owner: 'Client, brand team',
       state: 'open',
     },
+    {
+      id: 'hb2',
+      kind: 'question',
+      title: 'Which auth provider the client wants to standardize on',
+      ageDays: 7,
+      owner: 'Client, product',
+      state: 'open',
+    },
   ],
   activity: [
-    { id: 'ha1', daysAgo: 4, kind: 'ship', who: 'Devon', text: 'Shipped the account nav to staging' },
-    { id: 'ha2', daysAgo: 5, kind: 'request', who: 'Client', text: 'Asked for a saved payment methods view' },
+    { id: 'ha1', daysAgo: 5, kind: 'ship', who: 'Devon', text: 'Shipped the saved payments view' },
+    { id: 'ha2', daysAgo: 5, kind: 'request', who: 'Client', text: 'Asked for a spending summary card' },
     { id: 'ha3', daysAgo: 9, kind: 'message', who: 'Client', text: 'Last reply on the design thread' },
     { id: 'ha4', daysAgo: 12, kind: 'milestone', who: 'Priya', text: 'Discovery signed off' },
+  ],
+  resourcing: [
+    { name: 'Priya', role: 'Lead', allocation: 30 },
+    { name: 'Devon', role: 'Frontend', allocation: 80 },
+    { name: 'Ren', role: 'Design', allocation: 40 },
   ],
   gate: { label: 'Design review', daysAway: 3, blocks: 'dev on the member dashboard' },
 }
@@ -72,9 +90,9 @@ const keystone: Project = {
   ageDays: 132,
   initiallySnoozed: true,
   vitals: {
-    pulse: vital('pulse', trend(4, 12), [
-      { label: 'client quiet', value: '12 days' },
-      { label: 'last shipped', value: '6 days ago' },
+    pulse: vital('pulse', trend(4, 17), [
+      { label: 'client quiet', value: '17 days' },
+      { label: 'last shipped', value: '16 days ago' },
     ]),
     pressure: vital('pressure', trend(12, 22), [
       { label: 'hours used', value: '104%' },
@@ -92,13 +110,22 @@ const keystone: Project = {
   budget: { hoursUsed: 1040, hoursBudget: 1000, scopeDelivered: 82 },
   milestones: [
     { id: 'k1', title: 'Payments integration', dueInDays: -25, state: 'delivered' },
-    { id: 'k2', title: 'Fraud review', dueInDays: -4, state: 'slipped', gating: true },
+    {
+      id: 'k2',
+      title: 'Fraud review',
+      dueInDays: -4,
+      state: 'slipped',
+      gating: true,
+      slippedFrom: -12,
+      slipCount: 2,
+    },
     { id: 'k3', title: 'Go live', dueInDays: 2, state: 'current', gating: true },
     { id: 'k4', title: 'Post launch hardening', dueInDays: 20, state: 'upcoming' },
   ],
   blockers: [
     {
       id: 'kb1',
+      kind: 'blocker',
       title: 'PCI sign off from client security',
       ageDays: 19,
       owner: 'Client, security',
@@ -106,17 +133,21 @@ const keystone: Project = {
     },
     {
       id: 'kb2',
-      title: 'Staging parity with production',
+      kind: 'risk',
+      title: 'Staging has drifted from production',
       ageDays: 8,
       owner: 'Keystone platform',
       state: 'open',
     },
   ],
   activity: [
-    { id: 'ka1', daysAgo: 4, kind: 'milestone', who: 'Marcus', text: 'Fraud review slipped past its date' },
-    { id: 'ka2', daysAgo: 6, kind: 'ship', who: 'Ren', text: 'Shipped the refund flow to staging' },
-    { id: 'ka3', daysAgo: 12, kind: 'message', who: 'Client', text: 'Last reply from the security lead' },
+    { id: 'ka2', daysAgo: 16, kind: 'ship', who: 'Ren', text: 'Shipped the refund flow to staging' },
+    { id: 'ka3', daysAgo: 17, kind: 'message', who: 'Client', text: 'Last reply from the security lead' },
     { id: 'ka4', daysAgo: 19, kind: 'blocker', who: 'Ren', text: 'Opened the PCI sign off blocker' },
+  ],
+  resourcing: [
+    { name: 'Marcus', role: 'Lead', allocation: 15 },
+    { name: 'Ren', role: 'Backend', allocation: 20 },
   ],
   gate: { label: 'Go live', daysAway: 2, blocks: 'the launch on the 3rd' },
 }
@@ -130,7 +161,7 @@ const ferrous: Project = {
   vitals: {
     pulse: vital('pulse', trend(2, 3), [
       { label: 'client replied', value: '2 days ago' },
-      { label: 'last shipped', value: '1 day ago' },
+      { label: 'last shipped', value: '2 days ago' },
     ]),
     pressure: vital('pressure', trend(15, 26), [
       { label: 'hours used', value: '80%' },
@@ -154,6 +185,7 @@ const ferrous: Project = {
   blockers: [
     {
       id: 'fb1',
+      kind: 'blocker',
       title: 'Warehouse credential rotation',
       ageDays: 5,
       owner: 'Ferrous data engineering',
@@ -161,9 +193,13 @@ const ferrous: Project = {
     },
   ],
   activity: [
-    { id: 'fa1', daysAgo: 1, kind: 'ship', who: 'Devon', text: 'Shipped the extract step for orders' },
+    { id: 'fa1', daysAgo: 2, kind: 'ship', who: 'Devon', text: 'Shipped the extract step for orders' },
     { id: 'fa2', daysAgo: 3, kind: 'message', who: 'Client', text: 'Confirmed the cutover window' },
     { id: 'fa3', daysAgo: 6, kind: 'request', who: 'Client', text: 'Asked to include archived accounts' },
+  ],
+  resourcing: [
+    { name: 'Priya', role: 'Lead', allocation: 25 },
+    { name: 'Devon', role: 'Data engineer', allocation: 70 },
   ],
 }
 
@@ -194,12 +230,20 @@ const cobalt: Project = {
   budget: { hoursUsed: 1760, hoursBudget: 2000, scopeDelivered: 71 },
   milestones: [
     { id: 'c1', title: 'Phase 1 controls', dueInDays: -300, state: 'delivered' },
-    { id: 'c2', title: 'Phase 2 reporting', dueInDays: -60, state: 'slipped' },
+    {
+      id: 'c2',
+      title: 'Phase 2 reporting',
+      dueInDays: -60,
+      state: 'slipped',
+      slippedFrom: -180,
+      slipCount: 4,
+    },
     { id: 'c3', title: 'Phase 3 audit view', dueInDays: 40, state: 'current' },
   ],
   blockers: [
     {
       id: 'cb1',
+      kind: 'risk',
       title: 'Legal review of data retention',
       ageDays: 15,
       owner: 'Client, legal',
@@ -207,16 +251,22 @@ const cobalt: Project = {
     },
     {
       id: 'cb2',
-      title: 'SSO vendor ticket',
+      kind: 'question',
+      title: 'Which SSO vendor the client will settle on',
       ageDays: 12,
       owner: 'Cobalt IT',
       state: 'open',
     },
   ],
   activity: [
-    { id: 'cba1', daysAgo: 3, kind: 'milestone', who: 'Marcus', text: 'Phase 2 reporting slipped again' },
-    { id: 'cba2', daysAgo: 9, kind: 'message', who: 'Client', text: 'Routine check in from the PMO' },
-    { id: 'cba3', daysAgo: 11, kind: 'ship', who: 'Ren', text: 'Shipped the controls export' },
+    { id: 'cba1', daysAgo: 1, kind: 'ship', who: 'Priya', text: 'Small config fix and a review pass' },
+    { id: 'cba2', daysAgo: 3, kind: 'milestone', who: 'System', text: 'Phase 2 reporting slipped again' },
+    { id: 'cba3', daysAgo: 9, kind: 'message', who: 'Client', text: 'Routine check in from the PMO' },
+    { id: 'cba4', daysAgo: 11, kind: 'ship', who: 'Ren', text: 'Shipped the controls export' },
+  ],
+  resourcing: [
+    { name: 'Marcus', role: 'Lead', allocation: 20 },
+    { name: 'Priya', role: 'Frontend', allocation: 30 },
   ],
 }
 
@@ -229,7 +279,7 @@ const alder: Project = {
   vitals: {
     pulse: vital('pulse', flat(2), [
       { label: 'client replied', value: '1 day ago' },
-      { label: 'last shipped', value: '2 days ago' },
+      { label: 'last shipped', value: 'today' },
     ]),
     pressure: vital('pressure', flat(2), [
       { label: 'hours used', value: '92%' },
@@ -253,9 +303,13 @@ const alder: Project = {
   ],
   blockers: [],
   activity: [
-    { id: 'aa1', daysAgo: 1, kind: 'message', who: 'Client', text: 'Approved the launch checklist' },
-    { id: 'aa2', daysAgo: 2, kind: 'ship', who: 'Devon', text: 'Shipped the last landing page' },
+    { id: 'aa1', daysAgo: 0, kind: 'ship', who: 'Devon', text: 'Shipped the last landing page' },
+    { id: 'aa2', daysAgo: 1, kind: 'message', who: 'Client', text: 'Approved the launch checklist' },
     { id: 'aa3', daysAgo: 8, kind: 'milestone', who: 'Priya', text: 'Design QA signed off' },
+  ],
+  resourcing: [
+    { name: 'Priya', role: 'Lead', allocation: 30 },
+    { name: 'Devon', role: 'Frontend', allocation: 55 },
   ],
 }
 
@@ -292,6 +346,7 @@ const ovid: Project = {
   blockers: [
     {
       id: 'ob1',
+      kind: 'question',
       title: 'Analytics access from the growth team',
       ageDays: 3,
       owner: 'Ovid growth',
@@ -301,6 +356,10 @@ const ovid: Project = {
   activity: [
     { id: 'oa1', daysAgo: 1, kind: 'ship', who: 'Ren', text: 'Shared the first onboarding screens' },
     { id: 'oa2', daysAgo: 12, kind: 'milestone', who: 'Marcus', text: 'Project kicked off' },
+  ],
+  resourcing: [
+    { name: 'Marcus', role: 'Lead', allocation: 30 },
+    { name: 'Ren', role: 'Design', allocation: 50 },
   ],
 }
 

@@ -9,7 +9,7 @@
 
   How a score is built:
    1. Each vital produces a load in 0..1. Deterioration against the project's own
-      baseline dominates (0.72). Absolute out of band badness is capped context (0.28),
+      baseline dominates (0.72). Absolute out of band badness is capped context (0.24),
       so a chronically poor but steady vital cannot on its own raise the alarm.
    2. Loads are combined with weights. Pulse is weighted highest because silence is
       the earliest warning that a project is dying.
